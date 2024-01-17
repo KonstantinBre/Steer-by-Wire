@@ -41,3 +41,8 @@ void writeToMatlab (float number){
   Serial.write(13);  //CR   \r
   Serial.write(10);  //LF   \n
 }
+
+
+bool isEven(int number) {
+  return (number % 2) == 0;
+}

@@ -3,6 +3,14 @@
 #include <mcp2515.h>
 #include "functions.h"
 
+int counter=0;
+int sensor_number;
+int currentIndex;
+
+const int buffer_length = 500;
+const int columns =2;
+int buffer[columns][buffer_length];
+
 
 struct can_frame canMsg;
 MCP2515 mcp2515(53);  //depends on the baord: uno or mega!
@@ -21,47 +29,60 @@ void setup() {
    mcp2515.reset();
    mcp2515.setBitrate(CAN_500KBPS);  //Important for com!
    mcp2515.setNormalMode();
-
-   //Serial.println("------- CAN Read ----------");
-   //Serial.println("ID  DLC   DATA");
 }
-
 void loop() {
    if (mcp2515.readMessage(&canMsg) == MCP2515::ERROR_OK) {
-     //Serial.print(canMsg.can_id, DEC); // print ID
-     //Serial.print(" ");
-    //  Serial.print(canMsg.can_dlc, HEX); // print DLC
-    //  Serial.print("   ");
-    //  for (int i = 0; i<canMsg.can_dlc; i++)  {  // print the data
-    //    Serial.print(canMsg.data[i],BIN);
-    //    Serial.print(" ");
-    //  }
-
-     angle_s = canMsg.data[0] + canMsg.data[1];
-     byte data = canMsg.data[1];
-     String data_string = intToBinaryString(data);
 
 
-     String highByte_string =intToBinaryString(canMsg.data[1]);
-     String lowByte_string =intToBinaryString(canMsg.data[0]);
+      String highByte_string = intToBinaryString(canMsg.data[1]);
+      String lowByte_string = intToBinaryString(canMsg.data[0]);
+      float angle = binaryBytesToInt(highByte_string, lowByte_string);
 
-     float angle = binaryBytesToInt(highByte_string, lowByte_string);
 
-      // print ID
-      Serial.print(canMsg.can_id, DEC); 
-      Serial.print(" ");
+      if (isEven(counter))
+      {
+         //even
+         sensor_number = 0;
+         currentIndex = counter/2;
+         buffer[sensor_number][currentIndex] = angle;
+
+      } else
+      {
+         //odd
+         sensor_number = 1;
+         currentIndex = (counter-1)/2;
+         buffer[sensor_number][currentIndex] = angle;
+      }
+      
 
       //print the angle in monitor 
-      Serial.print("  Angle: ");
+      Serial.print("  Angle ");
+      Serial.print(sensor_number);
+      Serial.print(" : ");
       Serial.print(angle);
-      //Serial.write(angle);
-      Serial.print("  ");
-
-      //raw Byte data
-      Serial.print(highByte_string + lowByte_string);
-      Serial.println();
+      Serial.print("   ");
+      Serial.print(counter);
+      Serial.print("\n");
 
       //send data to Matlab
       //writeToMatlab(angle);
+
+
+      counter+=1;
+
+      while (counter > 1000)
+      {
+         for (size_t i = 0; i < 2; i++)
+         {
+            for (size_t j = 0; j < 500; j++)
+            {
+               Serial.print(buffer[i][j]);
+            }
+            
+         }
+         
+      }
+      
    }
 }
+
