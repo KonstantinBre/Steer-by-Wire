@@ -46,3 +46,24 @@ void writeToMatlab (float number){
 bool isEven(int number) {
   return (number % 2) == 0;
 }
+
+
+bool check_all_numb_of_arr_same( int arr[]){
+  const int size_arr = sizeof(arr) / sizeof(arr[0]); 
+
+  if (size_arr <=1)
+  {
+    return true;
+  }
+
+  for (size_t i = 0; i < size_arr; i++)
+  {
+    if (arr[i] != arr[0])
+    {
+      return false;
+    }
+    
+  }
+  
+  return true; //all elements of the array are the same
+}

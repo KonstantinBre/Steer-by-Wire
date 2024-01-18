@@ -70,8 +70,9 @@ void loop() {
 
       counter+=1;
 
-      while (counter > 1000)
+      if (counter > 1000)
       {
+         
          for (size_t i = 0; i < 2; i++)
          {
             for (size_t j = 0; j < 500; j++)
@@ -79,10 +80,8 @@ void loop() {
                Serial.print(buffer[i][j]);
             }
             
-         }
-         
-      }
-      
+         }        
+      }  
    }
 }
 
