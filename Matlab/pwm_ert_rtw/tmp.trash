@@ -1,0 +1,9 @@
+
+avrdude: AVR device initialized and ready to accept instructions
+avrdude: Device signature = 0x1e9801 (probably m2560)
+avrdude: reading input file "C:\Users\75001373\Documents\GitHub\Steer-by-Wire\Matlab/pwm.hex"
+avrdude: writing flash (22070 bytes):
+avrdude: 22070 bytes of flash written
+
+avrdude done.  Thank you.
+
