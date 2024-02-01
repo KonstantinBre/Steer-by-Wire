@@ -2,24 +2,18 @@
 #include <SPI.h>
 #include <mcp2515.h>
 #include "functions.h"
+#include <Arduino.h>
 
-int counter=0;
-int sensor_number;
-int currentIndex;
-
-const int buffer_length = 150;
-const int columns =2;
-int buffer[columns][buffer_length];
-const int amount_counter = buffer_length*2;
-
+int start_val0 = -1;
+int start_val1 = -1;
+bool counter;
+int steer_flag =-1;  
+int dif_angle =10;
 
 struct can_frame canMsg;
 MCP2515 mcp2515(53);  //depends on the baord: uno or mega!
-
 int angle = 0;
 String angle_s;
-
-
 uint16_t combineBytes(byte high, byte low) {
    return (static_cast<uint16_t>(high) << 8) | low; }
 
@@ -31,6 +25,8 @@ void setup() {
    mcp2515.setBitrate(CAN_500KBPS);  //Important for com!
    mcp2515.setNormalMode();
 }
+
+
 void loop() {
    if (mcp2515.readMessage(&canMsg) == MCP2515::ERROR_OK) {
 
@@ -40,75 +36,84 @@ void loop() {
       float angle = binaryBytesToInt(highByte_string, lowByte_string);
 
 
-      
+      counter = sign_func(counter); // counter switches betwenn 0 and 1 
       
 
-      if (counter < amount_counter)
+      
+      
+      // identifz the steer_flag
+      if (steer_flag == -1)
       {
-         if (isEven(counter))
+         if (counter == 0 ) 
          {
-            //even
-            sensor_number = 0;
-            currentIndex = counter/2;
-            buffer[sensor_number][currentIndex] = angle;
-
-         } else
-         {
-            //odd
-            sensor_number = 1;
-            currentIndex = (counter-1)/2;
-            buffer[sensor_number][currentIndex] = angle;
-         }
-
-         //print the angle in monitor 
-         Serial.print("  Angle ");
-         Serial.print(sensor_number);
-         Serial.print(" : ");
-         Serial.print(angle);
-         Serial.print("   ");
-         Serial.print(counter);
-         Serial.print("\n");
-
-         //send data to Matlab
-         //writeToMatlab(angle);
-      }
-      else{
-
-         // Serial.print("Counter above 1000, starting ");
-
-       
-         // Serial.print("First buffer in range ? True=1 False =0   :");
-         // Serial.print(check_all_numb_of_arr_in_range(buffer[0]));
-
-        
-         if (check_all_numb_of_arr_in_range(buffer[0]) == check_all_numb_of_arr_in_range(buffer[1]))
-         {
-            Serial.print("ERRRRRRRRRRRRRRRRROOOOOOOORRRRRRRRRR");
-         }
-         
+            if (start_val0 == -1)      
+            {
+               start_val0 = angle;
+               // Serial.print("Ich war hier!!!!!!");
                
-         if (isEven(counter))
-         {
-            if (check_all_numb_of_arr_in_range(buffer[0])==true)
+            } else if ((start_val0 + dif_angle) < angle ) 
             {
-               Serial.print("Steering wheel sensor:  ");
-               Serial.print(angle);
-               Serial.print("\n");
+               // Serial.print("Steering Wheeeel angle: ");
+               // Serial.println(angle);
+               // Serial.print("Flag ist 000000000000");
+               steer_flag = 0 ;
             }
-            else
+         }
+         if (counter == 1 ) 
+         {
+            if (start_val1 ==-1) 
             {
-               if (check_all_numb_of_arr_in_range(buffer[0])==false)
-               {
-                  Serial.print("Steering wheel sensor:  ");
-                  Serial.print(angle);
-                  Serial.print("\n");
-               }
-            } 
-         }     
-         
+               start_val1 = angle;
+               // Serial.print("Ich war hier!!!!!!");
+               
+
+            } else if ((start_val1 + dif_angle) < angle ) 
+            {
+               // Serial.print("Steering whell angle: ");
+               // Serial.println(angle);
+               // Serial.print("Flag ist 111111111111111111111");
+               steer_flag = 1 ;
+            }
+         }
       }
       
-      counter+=1;
+      // Serial.print(start_val0);
+      // Serial.print("\n");
+      // Serial.print(start_val1);
+      // Serial.print("\n");
+
+      // work with steer_flag
+      if (steer_flag == 1 || steer_flag == 0)
+      {
+         if (counter == 0 && steer_flag == 0 || counter == 1 && steer_flag == 1)
+         {
+            Serial.print("Steering wheel angle: ");
+            Serial.println(angle);
+         } else //if (counter == 0 && steer_flag == 1 || counter == 0 && steer_flag == 1)
+         {
+            Serial.print("Shaft angle: ");
+            Serial.println(angle);
+         }
+      }
+      
+      
+      
+      
+
+
+
+      //print the angle in monitor 
+      // Serial.print("  \nAngle ");
+      // Serial.print(counter);
+      // Serial.print(" : ");
+      // Serial.print(angle);
+      // Serial.print("   ");
+
+
+      //send data to Matlab
+      //writeToMatlab(angle);
+      
+
       
    }
 }

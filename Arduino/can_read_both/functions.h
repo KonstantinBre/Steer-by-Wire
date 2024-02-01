@@ -48,70 +48,16 @@ bool isEven(int number) {
 }
 
 
-bool check_all_numb_of_arr_same( int arr[]){
-  const int size_arr = sizeof(arr) / sizeof(arr[0]); 
 
-  if (size_arr <=1)
-  {
-    return true;
-  }
-
-  for (size_t i = 0; i < size_arr; i++)
-  {
-    if (arr[i] != arr[0])
-    {
-      return false;
-    }
-    
-  }
-
-  return true; //all elements of the array are the same
-}
-
-bool check_all_numb_of_arr_in_range( int arr[]){
-  const int size_arr = sizeof(arr) / sizeof(arr[0]); 
-
-
-  if (size_arr <=1)
-  {
-    return true;
-  }
-
-  for (size_t i = 0; i < size_arr; i++)
-  {
-    if ( arr[i] > (arr[0] + 10 ) ||  arr[i] < (arr[0] - 10 ) )
-    {
-      return false;
-    }
-    
-  }
-  
-  return true; //all elements of the array are at least in the range of +/- 10 degres
-}
-
-bool arr_outof_range(int arr[], int range){
-  const int size_arr = sizeof(arr) / sizeof(arr[0]); 
-
-  for (size_t i = 0; i < size_arr; i++)
-  {
-    if (arr[i] > arr[0] +10 || arr[i] < arr[0] -10)
-    {
-      // out of range
-      return true;
-    }
-    
-  }
-  
-}
 
 bool sign_func(bool num){
   // sign function, switches betwenn 0 and 1 
   if (num == true)
   {
-    return false
+    return false;
   } else
   {
-    return true
+    return true;
   }
   
 }
